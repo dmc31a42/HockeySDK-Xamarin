@@ -15,10 +15,24 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>DEBUG;__UNIFIED__</DefineConstants>
+    <DefineConstants>__MACOS__;DEBUG;__UNIFIED__</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>BeforeBuild</type>
+          <command>sh ./bootstrapper.sh -t bindings-mac</command>
+          <workingdir>${ProjectDir}/../..</workingdir>
+        </Command>
+        <Command>
+          <type>AfterClean</type>
+          <command>rm -rf externals/Mac</command>
+          <workingdir>${ProjectDir}/../..</workingdir>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <Optimize>true</Optimize>
@@ -27,6 +41,20 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <CustomCommands>
+      <CustomCommands>
+        <Command>
+          <type>BeforeBuild</type>
+          <command>sh ./bootstrapper.sh -t bindings-mac</command>
+          <workingdir>${ProjectDir}/../..</workingdir>
+        </Command>
+        <Command>
+          <type>AfterClean</type>
+          <command>rm -rf externals/Mac</command>
+          <workingdir>${ProjectDir}/../..</workingdir>
+        </Command>
+      </CustomCommands>
+    </CustomCommands>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />

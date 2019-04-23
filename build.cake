@@ -7,6 +7,7 @@ var NUGET_VERSION = "5.1.2";
 
 var ANDROID_URL = "https://download.hockeyapp.net/sdk/android/HockeySDK-Android-5.1.0.zip";
 var IOS_URL = "https://download.hockeyapp.net/sdk/ios/HockeySDK-iOS-5.1.2.zip";
+var MAC_URL = "https://download.hockeyapp.net/sdk/mac/HockeySDK-Mac-5.1.1.zip";
 
 var SAMPLES = new [] {
 	"./samples/HockeyAppSampleAndroid.sln",
@@ -22,7 +23,7 @@ Task ("libs")
 	.Does (() => 
 {
 	NuGetRestore ("./HockeySDK.sln");
-	DotNetBuild ("./HockeySDK.sln", c => c.Configuration = "Release");
+	MSBuild ("./HockeySDK.sln", c => c.Configuration = "Release");
 });
 
 Task ("samples")
@@ -31,12 +32,13 @@ Task ("samples")
 {
 	foreach (var s in SAMPLES) {
 		NuGetRestore (s);
-		DotNetBuild (s, c => c.Configuration = "Release");
+		MSBuild (s, c => c.Configuration = "Release");
 	}
 });
 
 Task("bindings-android").IsDependentOn("externals-android");
 Task("bindings-ios").IsDependentOn("externals-ios");
+Task("bindings-mac").IsDependentOn("externals-mac");
 
 Task ("externals-android")
 	.WithCriteria (!FileExists ("./externals/android/hockeyapp.android.zip"))
@@ -78,8 +80,27 @@ Task ("externals-ios")
 	CopyDirectory ("./externals/ios/HockeySDK-iOS/HockeySDKAllFeatures/HockeySDK.embeddedframework/HockeySDKResources.bundle", "./externals/ios/HockeySDKResources.bundle");
 });
 
+Task ("externals-mac")
+	.ReportError(exception =>
+{  
+    Console.WriteLine(exception.ToString());
+
+    if(!(exception is Cake.Core.CakeException)) throw exception;
+})
+	.WithCriteria (!FileExists ("./externals/Mac/hockeyapp.Mac.zip"))
+	.Does (() => 
+{
+	if (!DirectoryExists ("./externals/Mac"))
+		CreateDirectory ("./externals/Mac");
+
+	DownloadFile (MAC_URL, "./externals/Mac/hockeyapp.Mac.zip");
+	Unzip ("./externals/Mac/hockeyapp.Mac.zip", "./externals/Mac/");
+
+	CopyDirectory ("./externals/Mac/HockeySDK-Mac/HockeySDK.framework", "./externals/Mac/HockeySDK.framework");
+});
+
 // Create a common externals task depending on platform specific ones
-Task ("externals").IsDependentOn ("externals-ios").IsDependentOn ("externals-android");
+Task ("externals").IsDependentOn ("externals-ios").IsDependentOn ("externals-android").IsDependentOn ("externals-mac");
 
 // Create default nuget with all features.
 Task ("nuget")
@@ -90,6 +111,12 @@ Task ("nuget")
 	var basePath = IsRunningOnUnix () ? (System.IO.Directory.GetCurrentDirectory().ToString() + @"/.") : "./";
 
 	NuGetPack ("./HockeySDK.nuspec", new NuGetPackSettings {
+		Version = NUGET_VERSION,
+		BasePath = basePath,
+		Verbosity = NuGetVerbosity.Detailed
+	});
+
+	NuGetPack ("./HockeySDK_Xamarin.Mac.nuspec", new NuGetPackSettings {
 		Version = NUGET_VERSION,
 		BasePath = basePath,
 		Verbosity = NuGetVerbosity.Detailed
