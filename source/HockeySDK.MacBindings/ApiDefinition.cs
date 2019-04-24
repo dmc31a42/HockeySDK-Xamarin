@@ -13,20 +13,8 @@ namespace HockeyApp.Mac
     // typedef void (^BITLogHandler)(BITLogMessageProvider, BITLogLevel, const char *, const char *, uint);
     public unsafe delegate void BITLogHandler([BlockCallback] BITLogMessageProvider messageProvider, BITLogLevel logLevel, IntPtr file, IntPtr function, uint line);
 
-    // typedef void (*BITCrashManagerPostCrashSignalCallback)(void *context);
-    public delegate void BITCrashManagerPostCrashSignalCallback(IntPtr context);
-
     // typedef void (^BITCustomCrashReportUIHandler)(NSString *, NSString *);
     public delegate void BITCustomCrashReportUIHandler(string crashReportText, string applicationLog);
-
-    //[StructLayout(LayoutKind.Sequential)]
-    //public struct BITCrashManagerCallbacks
-    //{
-    //    // public void* context;
-    //    public IntPtr context;
-    //    // public BITCrashManagerPostCrashSignalCallback* handleSignal;
-    //    public BITCrashManagerPostCrashSignalCallback handleSignal;
-    //}
 
     [Static]
     partial interface Constants
@@ -326,9 +314,9 @@ namespace HockeyApp.Mac
         [Export("autoSubmitCrashReport")]
         bool AutoSubmitCrashReport { [Bind("isAutoSubmitCrashReport")] get; set; }
 
-        //// -(void)setCrashCallbacks:(BITCrashManagerCallbacks *)callbacks;
-        //[Export("setCrashCallbacks:")]
-        //unsafe void SetCrashCallbacks(BITCrashManagerCallbacks callbacks);
+        // -(void)setCrashCallbacks:(BITCrashManagerCallbacks *)callbacks;
+        [Export("setCrashCallbacks:")]
+        unsafe void SetCrashCallbacks(BITCrashManagerCallbacks callbacks);
 
         // -(void)setCrashReportUIHandler:(BITCustomCrashReportUIHandler)crashReportUIHandler;
         [Export("setCrashReportUIHandler:")]

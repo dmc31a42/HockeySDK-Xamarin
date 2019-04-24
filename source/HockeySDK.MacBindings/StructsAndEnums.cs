@@ -4,7 +4,17 @@ using ObjCRuntime;
 
 namespace HockeyApp.Mac
 {
-   
+    // typedef void (*BITCrashManagerPostCrashSignalCallback)(void *context);
+    public delegate void BITCrashManagerPostCrashSignalCallback(IntPtr context);
+
+    [StructLayout(LayoutKind.Sequential)]
+    public struct BITCrashManagerCallbacks
+    {
+        // public void* context;
+        public IntPtr context;
+        // public BITCrashManagerPostCrashSignalCallback* handleSignal;
+        public BITCrashManagerPostCrashSignalCallback handleSignal;
+    }
 
     [Native]
     public enum BITLogLevel : ulong
